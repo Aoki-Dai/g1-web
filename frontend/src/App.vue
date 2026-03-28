@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { Location, ChatMessage, SpeedMode } from './types'
+import type { ChatMessage, SpeedMode } from './types'
 import { useRobot } from './composables/useRobot'
 import { useVoiceInput } from './composables/useVoiceInput'
 import RobotStatusBar from './components/RobotStatusBar.vue'
-import LocationButton from './components/LocationButton.vue'
 import ConfirmDialog from './components/ConfirmDialog.vue'
 import VoiceInput from './components/VoiceInput.vue'
 import ChatPanel from './components/ChatPanel.vue'
 import SafetyControls from './components/SafetyControls.vue'
+import QuickActions from './components/QuickActions.vue'
+import type { QuickAction } from './components/QuickActions.vue'
+
+const quickActions: QuickAction[] = [
+  { label: 'ゴミ箱はどこ？', query: 'ゴミ箱はどこ？' },
+  { label: 'ペットボトルの捨て場所', query: 'ペットボトルどこに捨てればいい？' },
+  { label: 'トイレに案内して', query: 'トイレに案内して' },
+  { label: 'キッチンに行って', query: 'キッチンに行って' },
+  { label: '今どこにいる？', query: '今どこにいる？' },
+  { label: 'リモコンどこ？', query: 'リモコンどこに置いたっけ？' },
+]
 
 const {
   robotState,
@@ -24,31 +34,36 @@ const {
   sendAsk,
 } = useRobot()
 
-// --- 場所選択 ---
-const selectedLocation = ref<Location | null>(null)
+// --- 移動確認（音声経由） ---
+const selectedLocationName = ref('')
+const selectedLocationId = ref<string | null>(null)
 const showConfirm = ref(false)
 
-function onSelectLocation(location: Location) {
-  selectedLocation.value = location
-  showConfirm.value = true
-}
-
 async function onConfirmMove() {
-  if (!selectedLocation.value) return
+  if (!selectedLocationId.value) return
   showConfirm.value = false
-  await sendMove(selectedLocation.value.id)
-  selectedLocation.value = null
+  await sendMove(selectedLocationId.value)
+  selectedLocationId.value = null
+  selectedLocationName.value = ''
 }
 
 function onCancelMove() {
   showConfirm.value = false
-  selectedLocation.value = null
+  selectedLocationId.value = null
+  selectedLocationName.value = ''
 }
 
 // --- 音声入力 & チャット ---
 const chatMessages = ref<ChatMessage[]>([])
+const isAsking = ref(false)
+
+async function handleQuickAction(query: string) {
+  await handleVoiceResult(query)
+}
 
 async function handleVoiceResult(text: string) {
+  if (isAsking.value) return
+  isAsking.value = true
   chatMessages.value.push({ role: 'user', text })
 
   try {
@@ -59,7 +74,9 @@ async function handleVoiceResult(text: string) {
     if (response.action === 'move' && response.location_id) {
       const loc = locations.value.find(l => l.id === response.location_id)
       if (loc) {
-        onSelectLocation(loc)
+        selectedLocationId.value = loc.id
+        selectedLocationName.value = loc.name_ja
+        showConfirm.value = true
       }
     }
   } catch {
@@ -68,6 +85,7 @@ async function handleVoiceResult(text: string) {
       text: 'すみません、うまく聞き取れませんでした。もう一度お願いします。',
     })
   } finally {
+    isAsking.value = false
     voiceResetStatus()
   }
 }
@@ -130,25 +148,15 @@ async function onEmergencyStop() {
         :supported="voiceSupported"
         @toggle="startListening"
       />
+      <QuickActions
+        :actions="quickActions"
+        :disabled="isAsking || voiceStatus === 'listening'"
+        @select="handleQuickAction"
+      />
       <ChatPanel
         :messages="chatMessages"
         @speak="speakText"
       />
-    </section>
-
-    <!-- 場所選択セクション -->
-    <section class="locations">
-      <h2>行き先を選択</h2>
-      <div class="location-grid">
-        <LocationButton
-          v-for="loc in locations"
-          :key="loc.id"
-          :location="loc"
-          :disabled="robotState.status === 'moving'"
-          :is-current="robotState.current_location === loc.id"
-          @select="onSelectLocation"
-        />
-      </div>
     </section>
 
     <div class="spacer"></div>
@@ -168,7 +176,7 @@ async function onEmergencyStop() {
 
     <ConfirmDialog
       :visible="showConfirm"
-      :location-name="selectedLocation?.name_ja ?? ''"
+      :location-name="selectedLocationName"
       @confirm="onConfirmMove"
       @cancel="onCancelMove"
     />
@@ -193,17 +201,10 @@ async function onEmergencyStop() {
   margin: 0;
 }
 
-.voice-section h2,
-.locations h2 {
+.voice-section h2 {
   font-size: 16px;
   color: #666;
   margin: 0 0 8px;
-}
-
-.location-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
 }
 
 .spacer {
