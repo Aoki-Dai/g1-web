@@ -1,4 +1,4 @@
-#　UnitreeG1ハッカソン
+# UnitreeG1ハッカソン
 
 - Unitree G1をWebから動かしたい！リポジトリ
 
