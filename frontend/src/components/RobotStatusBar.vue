@@ -50,8 +50,9 @@ const locationLabels: Record<string, string> = {
 
 <style scoped>
 .status-bar {
-  background: #1a1a2e;
-  color: #fff;
+  background: #fff;
+  color: #222;
+  border: 1px solid #ddd;
   padding: 16px 20px;
   border-radius: 12px;
   display: flex;
@@ -88,7 +89,7 @@ const locationLabels: Record<string, string> = {
 
 .status-details {
   font-size: 14px;
-  color: #ccc;
+  color: #555;
 }
 
 .battery {
@@ -100,7 +101,7 @@ const locationLabels: Record<string, string> = {
 .battery-bar {
   flex: 1;
   height: 8px;
-  background: #333;
+  background: #e0e0e0;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -114,7 +115,7 @@ const locationLabels: Record<string, string> = {
 
 .battery-text {
   font-size: 12px;
-  color: #aaa;
+  color: #666;
   min-width: 36px;
 }
 </style>

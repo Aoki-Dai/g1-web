@@ -38,8 +38,8 @@ defineEmits<{
 }
 
 .dialog {
-  background: #1a1a2e;
-  border: 1px solid #333;
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 16px;
   padding: 32px;
   max-width: 400px;
@@ -49,7 +49,7 @@ defineEmits<{
 
 .dialog-message {
   font-size: 20px;
-  color: #fff;
+  color: #222;
   margin-bottom: 24px;
 }
 
@@ -71,8 +71,8 @@ defineEmits<{
 }
 
 .btn-cancel {
-  background: #333;
-  color: #fff;
+  background: #e0e0e0;
+  color: #222;
 }
 
 .btn-confirm {

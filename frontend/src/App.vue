@@ -88,13 +88,13 @@ async function onEmergencyStop() {
 .app-header h1 {
   font-size: 20px;
   text-align: center;
-  color: #fff;
+  color: #222;
   margin: 0;
 }
 
 .locations h2 {
   font-size: 16px;
-  color: #aaa;
+  color: #666;
   margin: 0 0 12px;
 }
 

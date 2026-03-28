@@ -36,8 +36,8 @@ defineEmits<{
   padding: 20px;
   border: 2px solid #3498db;
   border-radius: 16px;
-  background: #16213e;
-  color: #fff;
+  background: #fff;
+  color: #222;
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
@@ -45,7 +45,7 @@ defineEmits<{
 }
 
 .location-btn:hover:not(:disabled) {
-  background: #1a3a5c;
+  background: #e8f4fd;
   transform: scale(1.02);
 }
 
@@ -55,7 +55,7 @@ defineEmits<{
 
 .location-btn.current {
   border-color: #2ecc71;
-  background: #1a2e1a;
+  background: #e8f8e8;
 }
 
 .location-btn.disabled {
@@ -70,7 +70,7 @@ defineEmits<{
 
 .location-name-en {
   font-size: 14px;
-  color: #888;
+  color: #999;
 }
 
 .current-badge {
