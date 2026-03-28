@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   status: 'idle' | 'listening' | 'processing' | 'unsupported'
+  transcript: string
   interimTranscript: string
   supported: boolean
 }>()
@@ -36,12 +37,18 @@ defineEmits<{
     <p class="mic-label">
       <template v-if="!supported">音声入力に対応していません</template>
       <template v-else-if="status === 'idle'">タップして話しかけてください</template>
-      <template v-else-if="status === 'listening'">聞いています...</template>
+      <template v-else-if="status === 'listening'">聞いています...（もう一度タップで送信）</template>
       <template v-else-if="status === 'processing'">考えています...</template>
     </p>
 
-    <p v-if="interimTranscript" class="interim-text">
+    <!-- 認識途中のテキスト（話している最中にリアルタイム表示） -->
+    <p v-if="status === 'listening' && interimTranscript" class="transcript-text interim">
       {{ interimTranscript }}
+    </p>
+
+    <!-- 確定テキスト（認識完了後、API応答待ち中に表示） -->
+    <p v-else-if="status === 'processing' && transcript" class="transcript-text final">
+      「{{ transcript }}」
     </p>
   </div>
 </template>
@@ -85,8 +92,8 @@ defineEmits<{
 }
 
 .mic-btn.processing {
-  border-color: #999;
-  color: #999;
+  border-color: #f39c12;
+  color: #f39c12;
   cursor: wait;
 }
 
@@ -132,15 +139,24 @@ defineEmits<{
   color: #666;
 }
 
-.interim-text {
+.transcript-text {
   font-size: 16px;
-  color: #333;
-  background: #f0f0f0;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 12px;
   max-width: 100%;
   text-align: center;
   animation: fadeIn 0.2s;
+}
+
+.transcript-text.interim {
+  color: #666;
+  background: #f0f0f0;
+}
+
+.transcript-text.final {
+  color: #222;
+  background: #e8f4fd;
+  font-weight: 500;
 }
 
 @keyframes fadeIn {

@@ -82,7 +82,7 @@ async function handleVoiceResult(text: string) {
   } catch {
     chatMessages.value.push({
       role: 'assistant',
-      text: 'すみません、うまく聞き取れませんでした。もう一度お願いします。',
+      text: 'すみません、サーバーに接続できませんでした。もう一度お試しください。',
     })
   } finally {
     isAsking.value = false
@@ -92,6 +92,7 @@ async function handleVoiceResult(text: string) {
 
 const {
   status: voiceStatus,
+  transcript: voiceTranscript,
   interimTranscript,
   isSupported: voiceSupported,
   startListening,
@@ -144,6 +145,7 @@ async function onEmergencyStop() {
       <h2>G1に話しかける</h2>
       <VoiceInput
         :status="voiceStatus"
+        :transcript="voiceTranscript"
         :interim-transcript="interimTranscript"
         :supported="voiceSupported"
         @toggle="startListening"
