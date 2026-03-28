@@ -10,6 +10,7 @@ const statusLabels: Record<string, string> = {
   idle: '待機中',
   moving: '移動中',
   arrived: '到着',
+  paused: '一時停止中',
   error: 'エラー',
   emergency_stopped: '緊急停止',
 }
@@ -77,6 +78,7 @@ const locationLabels: Record<string, string> = {
 .status-badge.moving { background: #3498db; color: #fff; }
 .status-badge.arrived { background: #f39c12; color: #000; }
 .status-badge.error { background: #e74c3c; color: #fff; }
+.status-badge.paused { background: #f39c12; color: #000; }
 .status-badge.emergency_stopped { background: #e74c3c; color: #fff; }
 
 .connection {

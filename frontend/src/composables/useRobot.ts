@@ -1,5 +1,5 @@
 import { ref, onMounted, onUnmounted } from 'vue'
-import type { Location, RobotState, MoveResponse } from '../types'
+import type { Location, RobotState, MoveResponse, AskResponse, SpeedMode } from '../types'
 
 const robotState = ref<RobotState>({
   status: 'idle',
@@ -12,6 +12,8 @@ const robotState = ref<RobotState>({
 
 const locations = ref<Location[]>([])
 const isConnected = ref(false)
+const speedMode = ref<SpeedMode>('normal')
+const isPaused = ref(false)
 
 let ws: WebSocket | null = null
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
@@ -81,6 +83,37 @@ async function sendMove(locationId: string): Promise<MoveResponse> {
 
 async function sendStop(): Promise<MoveResponse> {
   const res = await fetch('/api/robot/stop', { method: 'POST' })
+  isPaused.value = false
+  return res.json()
+}
+
+async function sendPause(): Promise<MoveResponse> {
+  const res = await fetch('/api/robot/pause', { method: 'POST' })
+  isPaused.value = true
+  return res.json()
+}
+
+async function sendResume(): Promise<MoveResponse> {
+  const res = await fetch('/api/robot/resume', { method: 'POST' })
+  isPaused.value = false
+  return res.json()
+}
+
+async function sendSpeedMode(mode: SpeedMode): Promise<void> {
+  speedMode.value = mode
+  await fetch('/api/robot/speed', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode }),
+  })
+}
+
+async function sendAsk(question: string): Promise<AskResponse> {
+  const res = await fetch('/api/robot/ask', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question }),
+  })
   return res.json()
 }
 
@@ -98,7 +131,13 @@ export function useRobot() {
     robotState,
     locations,
     isConnected,
+    speedMode,
+    isPaused,
     sendMove,
     sendStop,
+    sendPause,
+    sendResume,
+    sendSpeedMode,
+    sendAsk,
   }
 }
